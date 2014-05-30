@@ -67,6 +67,10 @@ module ActsAsApi
     def allowed_to_render?(fieldset, field, model, options)
       return true unless fieldset.is_a? ActsAsApi::ApiTemplate
 
+      if excludes = options[:excluded_attributes]
+        return false if excludes.include? field
+      end
+
       fieldset_options = fieldset.options_for(field)
 
       if fieldset_options[:unless]

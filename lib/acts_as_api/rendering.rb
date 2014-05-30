@@ -29,6 +29,8 @@ module ActsAsApi
 
       meta_hash = render_options[:meta] if render_options.key?(:meta)
 
+      excludes = render_options.delete(:excluded_attributes)
+
       api_format =  api_format_options.keys.first
       api_model  =  api_format_options.values.first
 
@@ -62,7 +64,11 @@ module ActsAsApi
 
       output_params[:root] = api_root_name
 
-      api_response = api_model.as_api_response(api_template)
+      #output_params[:root] = output_params[:root].camelize if render_options.has_key?(:camelize) && render_options[:camelize]
+      #output_params[:root] = output_params[:root].dasherize if !render_options.has_key?(:dasherize) || render_options[:dasherize]
+
+      response_options = { excluded_attributes: excludes }
+      api_response = api_model.as_api_response(api_template, response_options)
 
       if api_response.is_a?(Array) && api_format.to_sym == :json && ActsAsApi::Config.include_root_in_json_collections
         api_response = api_response.collect { |f| { api_root_name.singularize => f } }
